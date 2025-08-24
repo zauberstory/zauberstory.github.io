@@ -19,15 +19,12 @@ function initBookNavigation() {
     
     let currentPage = 1;
     const totalPages = bookData.totalPages;
-    let autoPlayInterval;
-    let isAutoPlaying = false;
     
     // DOM Elements
     const prevBtn = document.getElementById('prevPage');
     const nextBtn = document.getElementById('nextPage');
     const currentPageSpan = document.getElementById('currentPage');
     const totalPagesSpan = document.getElementById('totalPages');
-    const autoPlayBtn = document.getElementById('autoPlayToggle');
     const pageElements = document.querySelectorAll('.book-page');
     const thumbnails = document.querySelectorAll('.page-thumb');
     
@@ -71,9 +68,6 @@ function initBookNavigation() {
     function nextPage() {
         if (currentPage < totalPages) {
             showPage(currentPage + 1);
-        } else if (isAutoPlaying) {
-            // Auto-play: restart from beginning
-            showPage(1);
         }
     }
     
@@ -91,68 +85,23 @@ function initBookNavigation() {
     thumbnails.forEach((thumb, index) => {
         thumb.addEventListener('click', () => {
             showPage(index + 1);
-            stopAutoPlay();
         });
     });
-    
-    // Auto-play functionality
-    function startAutoPlay() {
-        if (!bookData.autoPlay || totalPages <= 1) return;
-        
-        isAutoPlaying = true;
-        if (autoPlayBtn) {
-            autoPlayBtn.textContent = '⏸️ Auto-Play';
-            autoPlayBtn.classList.add('text-red-600');
-        }
-        
-        autoPlayInterval = setInterval(() => {
-            nextPage();
-        }, bookData.autoPlayDelay);
-    }
-    
-    function stopAutoPlay() {
-        isAutoPlaying = false;
-        if (autoPlayInterval) {
-            clearInterval(autoPlayInterval);
-            autoPlayInterval = null;
-        }
-        if (autoPlayBtn) {
-            autoPlayBtn.textContent = '▶️ Auto-Play';
-            autoPlayBtn.classList.remove('text-red-600');
-        }
-    }
-    
-    function toggleAutoPlay() {
-        if (isAutoPlaying) {
-            stopAutoPlay();
-        } else {
-            startAutoPlay();
-        }
-    }
-    
-    // Auto-play button
-    if (autoPlayBtn) {
-        autoPlayBtn.addEventListener('click', toggleAutoPlay);
-    }
     
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight' || e.key === ' ') {
             e.preventDefault();
             nextPage();
-            stopAutoPlay();
         } else if (e.key === 'ArrowLeft') {
             e.preventDefault();
             prevPage();
-            stopAutoPlay();
         } else if (e.key === 'Home') {
             e.preventDefault();
             showPage(1);
-            stopAutoPlay();
         } else if (e.key === 'End') {
             e.preventDefault();
             showPage(totalPages);
-            stopAutoPlay();
         }
     });
     
@@ -183,7 +132,6 @@ function initBookNavigation() {
                 // Swipe right - previous page
                 prevPage();
             }
-            stopAutoPlay();
         }
         
         startX = 0;
